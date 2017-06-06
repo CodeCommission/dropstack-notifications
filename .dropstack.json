@@ -1,0 +1,8 @@
+{
+  "variables": [],
+  "instances": 1,
+  "alias": "notifications.cloud.dropstack.run",
+  "type": "npm",
+  "name": "mvjdryta",
+  "serviceUrl": "mvjdryta.cloud.dropstack.run"
+}

@@ -1,0 +1,25 @@
+{
+  "name": "dropstack-notification",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "env $(cat .env-prod) linklet serve",
+    "dev": "env $(cat .env-dev) nodemon --exec linklet serve -p 3000",
+    "deploy": "dropstack deploy --url https://api.cloud.dropstack.run"
+  },
+  "engines": {
+    "node": "^6"
+  },
+  "dependencies": {
+    "linklet": "latest",
+    "lodash": "^4.17.4",
+    "moment": "^2.18.1",
+    "nodemailer": "^4.0.1",
+    "pouchdb": "^6.2.0",
+    "pouchdb-adapter-memory": "^6.2.0"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  }
+}
