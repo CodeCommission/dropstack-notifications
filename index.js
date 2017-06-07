@@ -55,8 +55,8 @@ PouchDB.replicate(new PouchDB(`${SYNC_BASE_URL}/deployments`), deploymentsDB, {l
 .on('complete', () => console.log(`Sync from ${SYNC_BASE_URL}/deployments completed`))
 .on('error', error => console.error(`Sync from ${SYNC_BASE_URL}/deployments error`));
 
-module.exports = interval({period: 500})(() => {
-  const endOfDay = moment().subtract(1,'days').endOf('day').toString();
+module.exports = interval({period: 1000})(() => {
+  const endOfDay = moment().endOf('day').toString();
   const currentDateTime = moment().toString();
 
   if(currentDateTime === endOfDay) {
@@ -71,12 +71,10 @@ module.exports = interval({period: 500})(() => {
 });
 
 function deploymentsChangedHandler(changes) {
-  console.log('Deployments changed');
   currentDeployments = changes.docs.filter(x => !x._deleted).map(x => Object.assign({}, x, {id: x._id, _id: undefined, _rev: undefined}));
 }
 
 function statisticsChangedHandler(changes) {
-  console.log('Statistics changed');
   currentStats = changes.docs
     .filter(x => !x._deleted)
     .map(x => Object.assign({}, x, {id: x._id, _id: undefined, _rev: undefined}));
@@ -87,7 +85,6 @@ function statisticsChangedHandler(changes) {
 }
 
 function usersChangedHandler(changes) {
-  console.log('Users changed');
   const changedUsers = changes.docs.filter(x => !x._deleted).map(x => Object.assign({}, {id:  x._id}, x.metadata));
   if(currentUsers.length === 0) currentUsers = changedUsers;
 
