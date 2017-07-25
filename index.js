@@ -71,42 +71,50 @@ module.exports = interval({period: 1000})(() => {
 });
 
 function deploymentsChangedHandler(changes) {
-  currentDeployments = changes.docs.filter(x => !x._deleted).map(x => Object.assign({}, x, {id: x._id, _id: undefined, _rev: undefined}));
+  deploymentsDB
+  .allDocs({include_docs: true})
+  .then(data => currentDeployments = data.rows.map(x => Object.assign({}, x.doc, {id: x.doc._id, _id: undefined, _rev: undefined})))
 }
 
 function statisticsChangedHandler(changes) {
-  currentStats = changes.docs
-    .filter(x => !x._deleted)
-    .map(x => Object.assign({}, x, {id: x._id, _id: undefined, _rev: undefined}));
-
-  currentStats = NODE_ENV === 'development'
-    ? currentStats.filter(x => x.id === 'go@dropstack.run')
-    : currentStats.filter(x => x.id !== 'admin')
+  statisticsDB
+  .allDocs({include_docs: true})
+  .then(data => {
+    currentStats = data.rows.map(x => Object.assign({}, x.doc, {id: x.doc._id, _id: undefined, _rev: undefined}));
+    currentStats = NODE_ENV === 'development'
+      ? currentStats.filter(x => x.id === 'go@dropstack.run')
+      : currentStats.filter(x => x.id !== 'admin')
+  });
 }
 
 function usersChangedHandler(changes) {
-  const changedUsers = changes.docs.filter(x => !x._deleted).map(x => Object.assign({}, {id:  x._id}, x.metadata));
-  if(currentUsers.length === 0) currentUsers = changedUsers;
+  usersDB
+  .allDocs({include_docs: true})
+  .then(data => {
+    changedUsers = data.rows.map(x => Object.assign({}, {id:  x.doc._id}, x.doc.metadata));
 
-  // changed users to send welcome email
-  const newUsers = _.differenceWith(changedUsers, currentUsers, (a, b) => a.id === b.id);
-  newUsers.forEach(x =>
-    sendWelcomeEmail({to: x.id})
-    .then(data => console.log(`Welcome email to ${x.id}. ${data}`))
-    .catch(console.error)
-  );
+    if(currentUsers.length === 0) currentUsers = changedUsers;
 
-  currentUsers = _.uniqBy(currentUsers.concat(newUsers), x => x.id);
+    // changed users to send welcome email
+    const newUsers = _.differenceWith(changedUsers, currentUsers, (a, b) => a.id === b.id);
+    newUsers.forEach(x =>
+      sendWelcomeEmail({to: x.id})
+      .then(data => console.log(`Welcome email to ${x.id}. ${data}`))
+      .catch(console.error)
+    );
 
-  // changed plan email
-  const changedUser = changedUsers[0] || {};
-  const currentUser = currentUsers.find(({id, plan}) => id === changedUser.id && plan !== changedUser.plan);
-  if(currentUser) {
-    currentUser.plan = changedUser.plan;
-    sendPlanEmail({to: changedUser.id, plan: changedUser.plan})
-    .then(data => console.log(`Plan changed email to ${changedUser.plan} for ${changedUser.id}. ${data}`))
-    .catch(console.error);
-  }
+    currentUsers = _.uniqBy(currentUsers.concat(newUsers), x => x.id);
+
+    // changed plan email
+    const changedUser = changedUsers[0] || {};
+    const currentUser = currentUsers.find(({id, plan}) => id === changedUser.id && plan !== changedUser.plan);
+    if(currentUser) {
+      currentUser.plan = changedUser.plan;
+      sendPlanEmail({to: changedUser.id, plan: changedUser.plan})
+      .then(data => console.log(`Plan changed email to ${changedUser.plan} for ${changedUser.id}. ${data}`))
+      .catch(console.error);
+    }
+  })
 }
 
 function sendWelcomeEmail ({to}) {

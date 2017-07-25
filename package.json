@@ -1,6 +1,7 @@
 {
   "name": "dropstack-notification",
-  "version": "1.0.0",
+  "description": "Dropstack E-Mail notifications",
+  "version": "1.0.2",
   "main": "index.js",
   "scripts": {
     "start": "env $(cat .env-prod) linklet serve",
