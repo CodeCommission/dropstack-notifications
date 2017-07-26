@@ -55,19 +55,22 @@ PouchDB.replicate(new PouchDB(`${SYNC_BASE_URL}/deployments`), deploymentsDB, {l
 .on('complete', () => console.log(`Sync from ${SYNC_BASE_URL}/deployments completed`))
 .on('error', error => console.error(`Sync from ${SYNC_BASE_URL}/deployments error`));
 
-module.exports = interval({period: 1000})(() => {
+module.exports = interval({period: 250})(() => {
   const endOfDay = moment().endOf('day').toString();
   const currentDateTime = moment().toString();
 
   if(currentDateTime === endOfDay) {
     currentStats.forEach(x => {
-      x.services = Object.keys(x.services).map(i => x.services[i]).map(y => Object.assign({}, y, currentDeployments.find(z => z.serviceName === y.name)));
+      x.services = Object.keys(x.services).map(i => x.services[i]).map(y => {
+        const currentDeployment = currentDeployments.find(z => z.serviceName === y.name)
+        return Object.assign({}, y, currentDeployment)
+      });
+      console.log(x.services)
       sendUsageEmail({to: x.id, usage: x})
       .then(data => console.log(`Statistic email to ${x.id}. ${data}`))
       .catch(console.error);
     })
   }
-
 });
 
 function deploymentsChangedHandler(changes) {
