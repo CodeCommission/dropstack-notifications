@@ -55,7 +55,7 @@ PouchDB.replicate(new PouchDB(`${SYNC_BASE_URL}/deployments`), deploymentsDB, {l
 .on('complete', () => console.log(`Sync from ${SYNC_BASE_URL}/deployments completed`))
 .on('error', error => console.error(`Sync from ${SYNC_BASE_URL}/deployments error`));
 
-module.exports = interval({period: 250})(() => {
+module.exports = interval({period: 1000})(() => {
   const endOfDay = moment().endOf('day').toString();
   const currentDateTime = moment().toString();
 
@@ -65,7 +65,7 @@ module.exports = interval({period: 250})(() => {
         const currentDeployment = currentDeployments.find(z => z.serviceName === y.name)
         return Object.assign({}, y, currentDeployment)
       });
-      console.log(x.services)
+
       sendUsageEmail({to: x.id, usage: x})
       .then(data => console.log(`Statistic email to ${x.id}. ${data}`))
       .catch(console.error);
@@ -91,33 +91,28 @@ function statisticsChangedHandler(changes) {
 }
 
 function usersChangedHandler(changes) {
-  usersDB
-  .allDocs({include_docs: true})
-  .then(data => {
-    changedUsers = data.rows.map(x => Object.assign({}, {id:  x.doc._id}, x.doc.metadata));
+  const changedUsers = changes.docs.filter(x => !x._deleted).map(x => Object.assign({}, {id:  x._id}, x.metadata));
+  if(currentUsers.length === 0) currentUsers = changedUsers;
 
-    if(currentUsers.length === 0) currentUsers = changedUsers;
+  // changed users to send welcome email
+  const newUsers = _.differenceWith(changedUsers, currentUsers, (a, b) => a.id === b.id);
+  newUsers.forEach(x =>
+    sendWelcomeEmail({to: x.id})
+    .then(data => console.log(`Welcome email to ${x.id}. ${data}`))
+    .catch(console.error)
+  );
 
-    // changed users to send welcome email
-    const newUsers = _.differenceWith(changedUsers, currentUsers, (a, b) => a.id === b.id);
-    newUsers.forEach(x =>
-      sendWelcomeEmail({to: x.id})
-      .then(data => console.log(`Welcome email to ${x.id}. ${data}`))
-      .catch(console.error)
-    );
+  currentUsers = _.uniqBy(currentUsers.concat(newUsers), x => x.id);
 
-    currentUsers = _.uniqBy(currentUsers.concat(newUsers), x => x.id);
-
-    // changed plan email
-    const changedUser = changedUsers[0] || {};
-    const currentUser = currentUsers.find(({id, plan}) => id === changedUser.id && plan !== changedUser.plan);
-    if(currentUser) {
-      currentUser.plan = changedUser.plan;
-      sendPlanEmail({to: changedUser.id, plan: changedUser.plan})
-      .then(data => console.log(`Plan changed email to ${changedUser.plan} for ${changedUser.id}. ${data}`))
-      .catch(console.error);
-    }
-  })
+  // changed plan email
+  const changedUser = changedUsers[0] || {};
+  const currentUser = currentUsers.find(({id, plan}) => id === changedUser.id && plan !== changedUser.plan);
+  if(currentUser) {
+    currentUser.plan = changedUser.plan;
+    sendPlanEmail({to: changedUser.id, plan: changedUser.plan})
+    .then(data => console.log(`Plan changed email to ${changedUser.plan} for ${changedUser.id}. ${data}`))
+    .catch(console.error);
+  }
 }
 
 function sendWelcomeEmail ({to}) {

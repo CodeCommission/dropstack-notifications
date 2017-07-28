@@ -102,6 +102,10 @@
         text-align: inherit;
       }
 
+      table.th {
+        text-align: left;
+      }
+
       table.row {
         padding: 0px;
         width: 100%;
@@ -812,74 +816,71 @@
               <tr>
                 <td class="center" align="center" valign="top">
                   <center>
-
                     <table class="container">
                     <tbody>
-                    <tr>
-                    <td>
-                      <center>
-                        <strong>SHIP IT • EVERYTHING • EVERYTIME</strong>
-                        <p></p>
-                        <h1><small>DROPSTACK | CLOUD</small></h1>
-                        <h3>Daily Usage Statistics</h3>
-                        <br/>
-                        <br/>
-                        <table class="container">
-                          <thead>
-                            <tr>
-                              <th>Type</th>
-                              <th>Status</th>
-                              <th>Instances</th>
-                              <th>Name</th>
-                              <th>Alias</th>
-                              <th>Request</th>
-                              <th>Response</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                          <% _.forEach(_.orderBy(usage.services, ['serviceInstances', 'outBytes'], ['asc', 'desc']), function(x) {%>
-                            <tr>
-                              <td><%= (x.serviceType || '-').toUpperCase() %></td>
-                              <td><%- x.serviceInstances ? 'DEPLOYED' : 'REMOVED' %> </td>
-                              <td><%= x.serviceInstances || 0 %></td>
-                              <td>
-                                <% if(x.serviceUrl) { %>
-                                  <a href="https://<%= x.serviceUrl %>" target="_blank"><%= x.name %></a>
-                                <% } else { %>
-                                  <%= x.name %>
-                                <% } %>
-                              </td>
-                              <td><a href="https://<%= x.serviceAlias %>" target="_blank"><%= x.serviceAlias %></a></td>
-                              <td><%= Math.floor((x.inBytes / 1024)) %> KB</td>
-                              <td><%= Math.floor((x.outBytes / 1024)) %> KB</td>
-                            </tr>
-                          <%});%>
-                          </tbody>
-                        </table>
-                        <br/>
-                        <br/>
-                        <p>To view real-time statistics just enter</p>
-                        <p>
-                          <code>
-                            dropstack metric --live
-                          </code>
-                        </p>
-                        <p></p>
-                        <p>If you have any questions, send us a note at <a href="mailto:go@dropstack.run">go@dropstack.run</a>. We'd love to help!</p>
-                        <p>Happy deploy!</p>
-                      </center>
-                      <hr>
-                    </td>
-                    </tr>
+                      <tr>
+                        <td>
+                          <center>
+                            <strong>SHIP IT • EVERYTHING • EVERYTIME</strong>
+                            <p></p>
+                            <h1><small>DROPSTACK | CLOUD</small></h1>
+                            <h3>Daily Usage Statistics</h3>
+                            <br/>
+                            <br/>
+                            <table class="container">
+                              <thead>
+                                <tr>
+                                  <th>Type</th>
+                                  <th>Status</th>
+                                  <th>Instances</th>
+                                  <th>Name</th>
+                                  <th>Alias</th>
+                                  <th>Request</th>
+                                  <th>Response</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                              <% _.forEach(_.orderBy(usage.services, ['serviceInstances', 'outBytes'], ['asc', 'desc']), function(x) {%>
+                                <tr>
+                                  <td><%= (x.serviceType || '-').toUpperCase() %></td>
+                                  <td><%- x.serviceInstances ? 'DEPLOYED' : 'REMOVED' %> </td>
+                                  <td><%= x.serviceInstances || 0 %></td>
+                                  <td>
+                                    <% if(x.serviceUrl) { %>
+                                      <a href="https://<%= x.serviceUrl %>" target="_blank"><%= x.name %></a>
+                                    <% } else { %>
+                                      <%= x.name %>
+                                    <% } %>
+                                  </td>
+                                  <td><a href="https://<%= x.serviceAlias %>" target="_blank"><%= x.serviceAlias %></a></td>
+                                  <td><%= (x.inBytes / (1024 * 1024)).toFixed(4) %> MB</td>
+                                  <td><%= (x.outBytes / (1024 * 1024)).toFixed(4) %> MB</td>
+                                </tr>
+                              <%});%>
+                              </tbody>
+                            </table>
+                            <br/>
+                            <br/>
+                            <p>To view real-time statistics just enter</p>
+                            <p>
+                              <code>
+                                dropstack metric --live
+                              </code>
+                            </p>
+                            <p></p>
+                            <p>If you have any questions, send us a note at <a href="mailto:go@dropstack.run">go@dropstack.run</a>. We'd love to help!</p>
+                            <p>Happy deploy!</p>
+                          </center>
+                          <hr>
+                        </td>
+                      </tr>
                     </tbody>
                     </table>
-
                   </center>
                 </td>
               </tr>
               </tbody>
             </table>
-
           </center>
         </td>
       </tr>
