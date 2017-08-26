@@ -853,8 +853,8 @@
                                     <% } %>
                                   </td>
                                   <td><a href="https://<%= x.serviceAlias %>" target="_blank"><%= x.serviceAlias %></a></td>
-                                  <td><%= (x.inBytes / (1024 * 1024)).toFixed(4) %> MB</td>
-                                  <td><%= (x.outBytes / (1024 * 1024)).toFixed(4) %> MB</td>
+                                  <td><%= (x.inBytes / (1024 * 1024)).toFixed(2) %> MB</td>
+                                  <td><%= (x.outBytes / (1024 * 1024)).toFixed(2) %> MB</td>
                                 </tr>
                               <%});%>
                               </tbody>
@@ -864,7 +864,7 @@
                             <p>To view real-time statistics just enter</p>
                             <p>
                               <code>
-                                dropstack metric --live
+                                dropstack metric
                               </code>
                             </p>
                             <p></p>
