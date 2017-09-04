@@ -831,10 +831,9 @@
                               <thead>
                                 <tr>
                                   <th>Type</th>
-                                  <th>Status</th>
                                   <th>Instances</th>
                                   <th>Name</th>
-                                  <th>Alias</th>
+                                  <th>Domain</th>
                                   <th>Request</th>
                                   <th>Response</th>
                                 </tr>
@@ -843,7 +842,6 @@
                               <% _.forEach(_.orderBy(usage.services, ['serviceInstances', 'outBytes'], ['asc', 'desc']), function(x) {%>
                                 <tr>
                                   <td><%= (x.serviceType || '-').toUpperCase() %></td>
-                                  <td><%- x.serviceInstances ? 'DEPLOYED' : 'REMOVED' %> </td>
                                   <td><%= x.serviceInstances || 0 %></td>
                                   <td>
                                     <% if(x.serviceUrl) { %>
@@ -852,7 +850,7 @@
                                       <%= x.name %>
                                     <% } %>
                                   </td>
-                                  <td><a href="https://<%= x.serviceAlias %>" target="_blank"><%= x.serviceAlias %></a></td>
+                                  <td><a href="https://<%= x.serviceDomain || x.serviceAlias %>" target="_blank"><%= x.serviceDomain || x.serviceAlias %></a></td>
                                   <td><%= (x.inBytes / (1024 * 1024)).toFixed(2) %> MB</td>
                                   <td><%= (x.outBytes / (1024 * 1024)).toFixed(2) %> MB</td>
                                 </tr>
