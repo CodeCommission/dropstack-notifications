@@ -61,10 +61,15 @@ module.exports = interval({period: 1000})(() => {
 
   if(currentDateTime === endOfDay) {
     currentStats.forEach(x => {
-      x.services = Object.keys(x.services).map(i => x.services[i]).map(y => {
-        const currentDeployment = currentDeployments.find(z => z.serviceName === y.name)
-        return Object.assign({}, y, currentDeployment)
-      });
+      x.services = Object.keys(x.services)
+        .map(i => x.services[i])
+        .filter(x => x.active)
+        .map(y => {
+          const currentDeployment = currentDeployments.find(z => z.serviceName === y.name && z.userId === x.id)
+          if(!currentDeployment) return;
+          return Object.assign({}, y, currentDeployment)
+        })
+        .filter(x => x);
 
       sendUsageEmail({to: x.id, usage: x})
       .then(data => console.log(`Statistic email to ${x.id}. ${data}`))
