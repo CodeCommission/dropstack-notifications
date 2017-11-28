@@ -2,8 +2,9 @@
   "variables": "",
   "instances": 1,
   "alias": "notifications.cloud.dropstack.run",
-  "type": "npm",
+  "type": "node8",
   "excludes": [],
+  "stateful": false,
   "name": "mvjdryta",
   "serviceUrl": "mvjdryta.cloud.dropstack.run"
 }
